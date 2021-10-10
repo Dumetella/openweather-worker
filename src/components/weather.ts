@@ -1,44 +1,42 @@
 import { WeatherLocation, Weather } from '../model/Weather';
 
 export default class WeatherProxy {
-
-    private api_key: string | undefined;
-    private keyQuery: string;
     private server: string;
+    private defaultParams: queryParams;
 
-    constructor() {
-        this.api_key = process.env.API_KEY;
-        if (this.api_key === undefined) {
-            throw new Error('No Open Weather API Key defined');
-        }
-        this.keyQuery = `appid=${this.api_key}`;
+    constructor(apiKey: string) {
+        this.defaultParams = {
+            appid: apiKey,
+        };
         this.server = 'http://api.openweathermap.org/data/2.5';
     }
 
-    public async searchLocation(term: string): Promise<WeatherLocation | undefined> {
+    public async searchLocation(term: string): Promise<WeatherLocation> {
 
-        const result = await fetch(`${this.server}/weather?q=${term}&${this.keyQuery}`);
+        const result = await this.makeRequest('weather', {
+            q: term,
+        });
 
-        if (result.status === 404) return undefined;
-        if (result.status !== 200) throw new Error('Failed to read location data');
-
-        return await result.json();
+        return new WeatherLocation(await result.json());
     }
 
     public async readWeather(locationId: number): Promise<Weather> {
 
-        const current = await fetch(`${this.server}/weather?id=${locationId}&${this.keyQuery}&units=metric`);
-
-        if (current.status !== 200) throw new Error('Failed to read location data');
+        const current = await this.makeRequest('weather', {
+            id: locationId,
+            units: 'metrics'
+        });
 
         return await current.json();
     }
 
     public async readForecast(locationId: number): Promise<Weather[]> {
 
-        const forecast = await fetch(`${this.server}/forecast?id=${locationId}&${this.keyQuery}&units=metric&cnt=8`);
-
-        if (forecast.status !== 200) throw new Error('Failed to read location data');
+        const forecast = await this.makeRequest('forecast', {
+            id: locationId,
+            units: 'metrics',
+            cnt: 8,
+        });
 
         return (await forecast.json()).list;
     }
@@ -46,10 +44,21 @@ export default class WeatherProxy {
     public getIconUrl(code: string): string {
         return `http://openweathermap.org/img/wn/${code}.png`;
     }
+
+    private async makeRequest(endpoint: string, params: queryParams): Promise<Response> {
+        const queryParams = {...this.defaultParams, ...params};
+
+        const q = Object.keys(queryParams).map(c => `${c}=${queryParams[c]}`).join('&');
+        const resp = await fetch(`${this.server}/${endpoint}?${q}`);
+
+        if (!resp.ok) {
+            throw new Error(`Failed to get ${endpoint}(${q})`);
+        }
+
+        return resp;
+    }
 }
 
-
-
-
-
-
+type queryParams = {
+    [key: string]: string | number,
+};

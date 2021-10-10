@@ -1,7 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import log4js from 'log4js';
-import WeatherProxy from './components/weather';
+import cors from 'cors';
+import WeatherProxy from './components/weather.js';
 
 
 dotenv.config();
@@ -17,22 +18,25 @@ if (!process.env.LOG_LEVEL) {
 const app = express();
 const port = process.env.PORT;
 
-if (!process.env.API_KEY) {
-    throw new Error('No api key');
-}
-const Weather = new WeatherProxy(process.env.API_KEY);
+app.use(cors());
 
+const Weather = new WeatherProxy(process.env.API_KEY!);
 
-console.log(Weather.searchLocation('Simferopol'));
+app.get('/location', async (request, response) => {
+    const data = await request.body;
+    response.end();
+});
 
-app.get('/', (request, response) => {
+app.get('/weather', async (request, response) => {
+    const data = await request.body;
     response.send('Hello world!');
 });
 
-app.listen(port, () => console.log(`Running on port ${port}`));
+const server = app.listen(port, () => console.log(`Running on port ${port}`));
 
 const onProcessSignal = async (signal: NodeJS.Signals) => {
     logger.info('Got signal', signal);
+    await server.close();
     logger.info('Bye...');
 };
 process.on('SIGTERM', onProcessSignal);

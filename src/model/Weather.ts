@@ -1,23 +1,45 @@
+export type CoordinatesType = {
+    lon: number
+    lat: number
+};
 
-export class Coordinates {
-    public lon: number;
-    public lat: number;
-    
-    constructor(obj?: any) {
-        this.lon = obj && obj['lon'] || -1;
-        this.lat = obj && obj['lat'] || -1;        
-    }
+export function CoordinatesEnforcer(obj?: any): CoordinatesType {
+    return {
+        lon: obj && obj['lon'] || -1,
+        lat: obj && obj['lat'] || -1,
+    };
 }
 
-export class WeatherLocation {
-    public coord: Coordinates;
-    public id: number;
-    public name: string;
-    constructor(obj?: any) {
-        this.coord = obj && new Coordinates(obj['coord']);
-        this.id = obj && obj['id'] || -1;
-        this.name = obj && obj['name'] || '';
+export type WeatherLocationType = {
+    coord: CoordinatesType
+    id: number
+    name: string
+};
+
+export function locationResponseEnforcer(obj?: any): WeatherLocationType {
+    return {
+        coord: obj && CoordinatesEnforcer(obj['coord']),
+        id: obj && obj['id'] || -1,
+        name: obj && obj['name'] || '',
+    };
+}
+
+export function WeatherResponseEnforcer(obj?: any): Weather {
+    return {
+        weather: obj && obj['weather'] || [],
+        main: obj && obj['main'] || {},
+        dt: obj && obj['dt'] || -1,
+    };
+}
+
+export function ForecastResponseEnforcer(obj?: any): Weather[] {
+    const list: Weather[] = [];
+    if (obj && obj['list'] && Array.isArray(obj['list'])) {
+        for (const e of obj['list']) {
+            list.push(e);
+        }
     }
+    return list;
 }
 
 export interface WeatherConditions {

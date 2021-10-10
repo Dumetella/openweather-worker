@@ -1,4 +1,5 @@
-import { WeatherLocation, Weather } from '../model/Weather';
+import { Weather, locationResponseEnforcer, WeatherLocationType, ForecastResponseEnforcer, WeatherResponseEnforcer } from '../model/Weather';
+import fetch, { Response } from 'node-fetch';
 
 export default class WeatherProxy {
     private server: string;
@@ -11,13 +12,13 @@ export default class WeatherProxy {
         this.server = 'http://api.openweathermap.org/data/2.5';
     }
 
-    public async searchLocation(term: string): Promise<WeatherLocation> {
+    public async searchLocation(term: string): Promise<WeatherLocationType> {
 
         const result = await this.makeRequest('weather', {
             q: term,
         });
 
-        return new WeatherLocation(await result.json());
+        return locationResponseEnforcer(await result.json());
     }
 
     public async readWeather(locationId: number): Promise<Weather> {
@@ -27,7 +28,7 @@ export default class WeatherProxy {
             units: 'metrics'
         });
 
-        return await current.json();
+        return await WeatherResponseEnforcer(current.json());
     }
 
     public async readForecast(locationId: number): Promise<Weather[]> {
@@ -38,7 +39,7 @@ export default class WeatherProxy {
             cnt: 8,
         });
 
-        return (await forecast.json()).list;
+        return ForecastResponseEnforcer(await forecast.json());
     }
 
     public getIconUrl(code: string): string {
@@ -46,7 +47,7 @@ export default class WeatherProxy {
     }
 
     private async makeRequest(endpoint: string, params: queryParams): Promise<Response> {
-        const queryParams = {...this.defaultParams, ...params};
+        const queryParams = { ...this.defaultParams, ...params };
 
         const q = Object.keys(queryParams).map(c => `${c}=${queryParams[c]}`).join('&');
         const resp = await fetch(`${this.server}/${endpoint}?${q}`);

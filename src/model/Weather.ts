@@ -1,13 +1,23 @@
 
-export interface Coordinates {
-    lon: number;
-    lat: number;
+export class Coordinates {
+    public lon: number;
+    public lat: number;
+    
+    constructor(obj?: any) {
+        this.lon = obj && obj['lon'] || -1;
+        this.lat = obj && obj['lat'] || -1;        
+    }
 }
 
-export interface WeatherLocation {
-    coord: Coordinates;
-    id: number;
-    name: string;
+export class WeatherLocation {
+    public coord: Coordinates;
+    public id: number;
+    public name: string;
+    constructor(obj?: any) {
+        this.coord = obj && new Coordinates(obj['coord']);
+        this.id = obj && obj['id'] || -1;
+        this.name = obj && obj['name'] || '';
+    }
 }
 
 export interface WeatherConditions {

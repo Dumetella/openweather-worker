@@ -1,4 +1,4 @@
-import { Weather, locationResponseEnforcer, WeatherLocationType, ForecastResponseEnforcer, WeatherResponseEnforcer } from '../model/Weather.js';
+import { Weather, locationResponseEnforcer, WeatherLocationType, forecastResponseEnforcer, weatherResponseEnforcer } from '../model/weatherModel.js';
 import fetch, { Response } from 'node-fetch';
 
 export default class WeatherProxy {
@@ -28,7 +28,7 @@ export default class WeatherProxy {
             units: 'metrics'
         });
 
-        return await WeatherResponseEnforcer(current.json());
+        return weatherResponseEnforcer(await current.json());
     }
 
     public async readForecast(locationId: number): Promise<Weather[]> {
@@ -39,7 +39,7 @@ export default class WeatherProxy {
             cnt: 8,
         });
 
-        return ForecastResponseEnforcer(await forecast.json());
+        return forecastResponseEnforcer(await forecast.json());
     }
 
     public getIconUrl(code: string): string {

@@ -3,7 +3,7 @@ export type CoordinatesType = {
     lat: number
 };
 
-export function CoordinatesEnforcer(obj?: any): CoordinatesType {
+export function coordinatesEnforcer(obj?: any): CoordinatesType {
     return {
         lon: obj && obj['lon'] || -1,
         lat: obj && obj['lat'] || -1,
@@ -18,13 +18,13 @@ export type WeatherLocationType = {
 
 export function locationResponseEnforcer(obj?: any): WeatherLocationType {
     return {
-        coord: obj && CoordinatesEnforcer(obj['coord']),
+        coord: obj && coordinatesEnforcer(obj['coord']),
         id: obj && obj['id'] || -1,
         name: obj && obj['name'] || '',
     };
 }
 
-export function WeatherResponseEnforcer(obj?: any): Weather {
+export function weatherResponseEnforcer(obj?: any): Weather {
     return {
         weather: obj && obj['weather'] || [],
         main: obj && obj['main'] || {},
@@ -32,7 +32,7 @@ export function WeatherResponseEnforcer(obj?: any): Weather {
     };
 }
 
-export function ForecastResponseEnforcer(obj?: any): Weather[] {
+export function forecastResponseEnforcer(obj?: any): Weather[] {
     const list: Weather[] = [];
     if (obj && obj['list'] && Array.isArray(obj['list'])) {
         for (const e of obj['list']) {

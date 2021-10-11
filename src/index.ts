@@ -1,9 +1,8 @@
-import express from 'express';
+import express, { response } from 'express';
 import dotenv from 'dotenv';
 import log4js from 'log4js';
 import cors from 'cors';
 import WeatherProxy from './components/weather.js';
-
 
 dotenv.config();
 
@@ -18,18 +17,26 @@ if (!process.env.LOG_LEVEL) {
 const app = express();
 const port = process.env.PORT;
 
-app.use(cors());
+app.use(express.json());
+
+app.use(cors({
+    origin: '*',
+}));
 
 const Weather = new WeatherProxy(process.env.API_KEY!);
 
-app.get('/location', async (request, response) => {
-    const data = await request.body;
-    response.end();
+app.get('/', async (request, response) => {
+    response.send('Hello world!');
 });
 
-app.get('/weather', async (request, response) => {
+app.post('/location', async (request, response) => {
     const data = await request.body;
-    response.send('Hello world!');
+    const city = data.location;
+    logger.info(city);
+    const res = await Weather.searchLocation(city);
+    logger.info(res);
+    response.send(res);
+    response.end();
 });
 
 const server = app.listen(port, () => console.log(`Running on port ${port}`));
@@ -41,3 +48,4 @@ const onProcessSignal = async (signal: NodeJS.Signals) => {
 };
 process.on('SIGTERM', onProcessSignal);
 process.on('SIGINT', onProcessSignal);
+

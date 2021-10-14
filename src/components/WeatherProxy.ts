@@ -1,4 +1,4 @@
-import { Weather, locationResponseEnforcer, WeatherLocationType, forecastResponseEnforcer, weatherResponseEnforcer } from '../model/weatherModel.js';
+import { Weather, locationResponseEnforcer, WeatherLocationType, forecastResponseEnforcer, weatherResponseEnforcer } from '../model/WeatherRequests.js';
 import fetch, { Response } from 'node-fetch';
 
 export default class WeatherProxy {

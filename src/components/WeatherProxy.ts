@@ -25,7 +25,7 @@ export default class WeatherProxy {
 
         const current = await this.makeRequest('weather', {
             id: locationId,
-            units: 'metrics'
+            units: 'metric'
         });
 
         return weatherResponseEnforcer(await current.json());
@@ -35,7 +35,7 @@ export default class WeatherProxy {
 
         const forecast = await this.makeRequest('forecast', {
             id: locationId,
-            units: 'metrics',
+            units: 'metric',
             cnt: 8,
         });
 

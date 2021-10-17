@@ -30,24 +30,26 @@ app.get('/', async (request, response) => {
     response.send('Hi, i am Dumetella');
 });
 
-app.post('/location', async (request, response) => {
+app.post('/api/v1/location', async (request, response) => {
     const data = locationRequestEnforcer(request.body);
     const res = await Weather.searchLocation(data.city);
     response.send(res);
     response.end();
 });
 
-app.post('/weather', async (request, response) => {
+app.post('/api/v1/weather', async (request, response) => {
     const data = weatherRequestEnforcer(request.body);
     const res = await Weather.readWeather(data.locationId);
     response.send(res);
+    logger.info(res);
     response.end();
 });
 
-app.post('/forecast', async (request, response) => {
+app.post('/api/v1/forecast', async (request, response) => {
     const data = weatherRequestEnforcer(request.body);
     const res = await Weather.readForecast(data.locationId);
     response.send(res);
+    logger.info(res);
     response.end();
 });
 

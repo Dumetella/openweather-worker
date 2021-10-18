@@ -33,3 +33,4 @@ config.json
 database.json
 cache/
 .env
+Weather.db

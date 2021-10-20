@@ -1,3 +1,4 @@
+import { Weather } from 'src/model/WeatherRequests.js';
 import appDAO from './appDAO.js';
 
 class DataBase {
@@ -48,6 +49,31 @@ class DataBase {
                 ':data': data
             }
         );
+    }
+    public async getWeather(id: number): Promise<Weather | undefined> {
+        const res = await this.dao.get(
+            'SELECT Data FROM Weather WHERE LocationID = :id AND Time > :time',
+            {
+                ':id': id,
+                ':time': new Date().getTime() - 1000 * 60 * 60,
+            }
+        );
+        return res && JSON.parse(res.Data) || undefined;
+    }
+
+    public async getForecast(id: number): Promise<Weather[] | undefined> {
+        const res = await this.dao.get(
+            'SELECT Data FROM Forecast WHERE LocationID = :id',
+            {
+                ':id': id,
+            }
+        );
+        return res && JSON.parse(res.Data) || undefined;
+    }
+
+    public async close(): Promise<void> {
+        await this.dao.close();
+        console.log('Database connection closed');
     }
 }
 

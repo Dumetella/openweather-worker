@@ -41,6 +41,12 @@ app.get('/', async (request, response) => {
 
 app.post('/api/v1/location', async (request, response) => {
     const data = locationRequestEnforcer(request.body);
+    //TODO error clas and send error
+    if (!data.city) {
+        response.status(403);
+        response.end();
+        return;
+    }
     const res = await Weather.searchLocation(data.city);
     response.send(res);
     response.end();
@@ -48,19 +54,35 @@ app.post('/api/v1/location', async (request, response) => {
 
 app.post('/api/v1/weather', async (request, response) => {
     const data = weatherRequestEnforcer(request.body);
-    const res = await Weather.readWeather(data.locationId);
-    db.insertWeather(new Date().getTime(), data.locationId, JSON.stringify(res));
+    //TODO Error class and send error
+    if (data.locationId === -1) {
+        response.status(403);
+        response.end();
+        return;
+    }
+    let res = await db.getWeather(data.locationId);
+    if (!res) {
+        res = await Weather.readWeather(data.locationId);
+        db.insertWeather(new Date().getTime(), data.locationId, JSON.stringify(res));
+    }
     response.send(res);
     response.end();
 });
 
 app.post('/api/v1/forecast', async (request, response) => {
     const data = weatherRequestEnforcer(request.body);
-    //check for locationID -1
-    const res = await Weather.readForecast(data.locationId);
-
+    //TODO Error class and send error
+    if (data.locationId === -1) {
+        response.status(403);
+        response.end();
+        return;
+    }
+    let res = await db.getForecast(data.locationId);
+    if (!res) {
+        res = await Weather.readForecast(data.locationId);
+        db.insertForecast(new Date().getTime(), data.locationId, JSON.stringify(res));
+    };
     response.send(res);
-
     response.end();
 });
 
@@ -68,16 +90,12 @@ const server = app.listen(port, () => console.log(`Running on port ${port}`));
 
 const onProcessSignal = async (signal: NodeJS.Signals) => {
     logger.info('Got signal', signal);
-    // db.close((err) => {
-    //     if (err) {
-    //         logger.error(err.message);
-    //     }
-    //     logger.info('Closed the database connection.');
-    // });
+    await db.close();
     server.close();
     logger.info('Bye...');
 };
 process.on('SIGTERM', onProcessSignal);
 process.on('SIGINT', onProcessSignal);
+
 
 

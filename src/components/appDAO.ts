@@ -25,9 +25,38 @@ export default class appDAO {
         return new Promise<void>((resolve, reject) => {
             this.db.run(sql, params, (err) => {
                 if (err) {
-                    console.log('Error running sql ' + sql);
+                    console.warn('Error running sql ' + sql);
                     console.log(err);
                     reject(err);
+                    return;
+                }
+                resolve();
+            });
+        });
+    }
+
+    public get(sql: string, params?: SQL_params): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            this.db.get(sql, params, (err, result) => {
+                if (err) {
+                    console.warn('Error running sql ' + sql);
+                    console.log(err);
+                    reject(err);
+                    return;
+                }
+                resolve(result);
+            });
+        });
+    }
+
+    public close(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this.db.close((err) => {
+                if (err) {
+                    console.log('Error while closing the database');
+                    console.log(err);
+                    reject(err);
+                    return;
                 }
                 resolve();
             });

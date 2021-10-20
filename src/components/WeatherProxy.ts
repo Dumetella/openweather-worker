@@ -18,7 +18,7 @@ export default class WeatherProxy {
             q: term,
         });
 
-        return locationResponseEnforcer(await result.json());
+        return locationResponseEnforcer(await result?.json());
     }
 
     public async readWeather(locationId: number): Promise<Weather> {
@@ -28,7 +28,7 @@ export default class WeatherProxy {
             units: 'metric'
         });
 
-        return weatherResponseEnforcer(await current.json());
+        return weatherResponseEnforcer(await current?.json());
     }
 
     public async readForecast(locationId: number): Promise<Weather[]> {
@@ -39,21 +39,28 @@ export default class WeatherProxy {
             cnt: 8,
         });
 
-        return forecastResponseEnforcer(await forecast.json());
+        return forecastResponseEnforcer(await forecast?.json());
     }
 
     public getIconUrl(code: string): string {
         return `http://openweathermap.org/img/wn/${code}.png`;
     }
 
-    private async makeRequest(endpoint: string, params: queryParams): Promise<Response> {
+    private async makeRequest(endpoint: string, params: queryParams): Promise<Response | undefined> {
+
         const queryParams = { ...this.defaultParams, ...params };
 
         const q = Object.keys(queryParams).map(c => `${c}=${queryParams[c]}`).join('&');
-        const resp = await fetch(`${this.server}/${endpoint}?${q}`);
+        let resp: Response | undefined = undefined;
 
-        if (!resp.ok) {
-            throw new Error(`Failed to get ${endpoint}(${q})`);
+        try {
+            resp = await fetch(`${this.server}/${endpoint}?${q}`);
+        } catch (err) {
+            console.log(err);
+        }
+
+        if (!resp?.ok) {
+            console.log(`Failed to get ${endpoint}(${q})`);
         }
 
         return resp;

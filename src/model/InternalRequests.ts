@@ -6,13 +6,13 @@ export type WeatherRequest = {
     locationId: number
 };
 
-export function locationRequestEnforcer(obj?: any): LocationRequest {
+export function locationRequestEnforcer(obj?: unknown): LocationRequest {
     return {
         city: obj && obj['city'] || '',
     };
 }
 
-export function weatherRequestEnforcer(obj?: any): WeatherRequest {
+export function weatherRequestEnforcer(obj?: unknown): WeatherRequest {
     return {
         locationId: obj && obj['locationId'] || -1,
     };

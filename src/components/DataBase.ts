@@ -63,9 +63,10 @@ class DataBase {
 
     public async getForecast(id: number): Promise<Weather[] | undefined> {
         const res = await this.dao.get(
-            'SELECT Data FROM Forecast WHERE LocationID = :id',
+            'SELECT Data FROM Forecast WHERE LocationID = :id AND Time > :time',
             {
                 ':id': id,
+                ':time': new Date().getTime() - 3000 * 60 * 60,
             }
         );
         return res && JSON.parse(res.Data) || undefined;
@@ -73,7 +74,6 @@ class DataBase {
 
     public async close(): Promise<void> {
         await this.dao.close();
-        console.log('Database connection closed');
     }
 }
 

@@ -1,3 +1,4 @@
+import log4js from 'log4js';
 import { join } from 'path';
 import sqlite3 from 'sqlite3';
 
@@ -10,13 +11,15 @@ type SQL_params = {
 export default class appDAO {
     private db: sqlite3.Database;
     private fileName: string;
+    private logger: log4js.Logger;
     constructor(file?: string) {
+        this.logger = log4js.getLogger('AppDAO');
         this.fileName = join(process.cwd(), file || DB_PATH_DEFAULT);
         this.db = new sqlite3.Database(this.fileName, sqlite3.OPEN_READWRITE, (err) => {
             if (err) {
-                console.warn('Could not connect to database', err);
+                this.logger.error('Could not connect to database', err);
             } else {
-                console.log('Connected to database');
+                this.logger.info('Connected to database');
             }
         });
     }
@@ -25,8 +28,8 @@ export default class appDAO {
         return new Promise<void>((resolve, reject) => {
             this.db.run(sql, params, (err) => {
                 if (err) {
-                    console.warn('Error running sql ' + sql);
-                    console.log(err);
+                    this.logger.error('Error running sql ' + sql);
+                    this.logger.error(err);
                     reject(err);
                     return;
                 }
@@ -39,8 +42,8 @@ export default class appDAO {
         return new Promise<any>((resolve, reject) => {
             this.db.get(sql, params, (err, result) => {
                 if (err) {
-                    console.warn('Error running sql ' + sql);
-                    console.log(err);
+                    this.logger.error('Error running sql ' + sql);
+                    this.logger.error(err);
                     reject(err);
                     return;
                 }
@@ -53,12 +56,13 @@ export default class appDAO {
         return new Promise<void>((resolve, reject) => {
             this.db.close((err) => {
                 if (err) {
-                    console.log('Error while closing the database');
-                    console.log(err);
+                    this.logger.error('Error while closing the database');
+                    this.logger.error(err);
                     reject(err);
                     return;
                 }
                 resolve();
+                this.logger.info('Database connection closed');
             });
         });
     }

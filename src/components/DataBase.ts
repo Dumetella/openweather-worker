@@ -9,7 +9,15 @@ class DataBase {
 
     public async init(): Promise<void> {
 
-        const sql1 = `
+        const drop = `
+        DROP TABLE Weather
+        `
+
+        const drop2 = `
+        DROP TABLE Forecast
+        `
+
+        const create = `
         CREATE TABLE IF NOT EXISTS Weather
         (
         Time INTEGER,
@@ -17,7 +25,7 @@ class DataBase {
         Data TEXT
         )`;
 
-        const sql2 = `
+        const create2 = `
         CREATE TABLE IF NOT EXISTS Forecast
         (
         Time INTEGER,
@@ -25,8 +33,10 @@ class DataBase {
         Data TEXT
         )`;
 
-        await this.dao.run(sql1);
-        await this.dao.run(sql2);
+        await this.dao.run(drop)
+        await this.dao.run(drop2)
+        await this.dao.run(create);
+        await this.dao.run(create2);
     }
 
     public async insertWeather(time: number, id: number, data: string): Promise<void> {

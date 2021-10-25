@@ -97,7 +97,7 @@ app.post('/api/v1/forecast', async (request, response) => {
     response.end();
 });
 
-const server = app.listen(port, () => console.log(`Running on port ${port}`));
+const server = app.listen(port, () => logger.info(`Running on port ${port}`));
 
 const onProcessSignal = async (signal: NodeJS.Signals) => {
     logger.info('Got signal', signal);

@@ -11,11 +11,11 @@ class DataBase {
 
         const drop = `
         DROP TABLE Weather
-        `
+        `;
 
         const drop2 = `
         DROP TABLE Forecast
-        `
+        `;
 
         const create = `
         CREATE TABLE IF NOT EXISTS Weather
@@ -33,8 +33,8 @@ class DataBase {
         Data TEXT
         )`;
 
-        await this.dao.run(drop)
-        await this.dao.run(drop2)
+        await this.dao.run(drop);
+        await this.dao.run(drop2);
         await this.dao.run(create);
         await this.dao.run(create2);
     }
